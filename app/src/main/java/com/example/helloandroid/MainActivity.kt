@@ -1,13 +1,29 @@
 package com.example.helloandroid
 
+import android.app.Activity
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.Serializable
 
-data class Person(val name: String, val age: Int)
+data class Person(val name: String, val age: Int) : Serializable
+
+const val KEY_PERSON = "person"
 
 class MainActivity : AppCompatActivity() {
+    companion object {
+        private const val TAG = "MainActivity"
+        private const val REQUEST_CODE = 89
+    }
+
+    lateinit var contactsList: MutableList<Person>
+    lateinit var contactsAdapter: ContactsAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -16,9 +32,10 @@ class MainActivity : AppCompatActivity() {
 
         // 1. Add RecyclerView AndroidX library to the Gradle build file
         // 2. Define a model class to use as the data source
-        val contacts: List<Person> = createContacts()
+        contactsList = createContacts()
         // 3. Add a RecyclerView to your activity to display the items
-        rvContacts.adapter = ContactsAdapter(this, contacts)
+        contactsAdapter = ContactsAdapter(this, contactsList)
+        rvContacts.adapter = contactsAdapter
         // 4. Create a custom row layout XML file to visualize the single item
 
         // 5. Create a RecyclerView.Adapter and ViewHolder to render the item
@@ -27,11 +44,40 @@ class MainActivity : AppCompatActivity() {
         rvContacts.layoutManager = LinearLayoutManager(this)
     }
 
-    private fun createContacts(): List<Person> {
+    private fun createContacts(): MutableList<Person> {
         val contacts = mutableListOf<Person>()
         for(i in 1..100) {
             contacts.add(Person("Person $i", i))
         }
         return contacts
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Log.i(TAG, "onOptionsItemSelected")
+        if(item.itemId == R.id.mi_add) {
+            val intent = Intent(this, AddContactActivity::class.java)
+//            startActivity(intent)
+            startActivityForResult(intent, REQUEST_CODE)
+//            registerForActivityResult(...)
+            Log.i(TAG, "created activity inside onOptionsItemSelected")
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            // we got data back successfully from the AddContactActivity
+            val person = data?.getSerializableExtra(KEY_PERSON) as Person
+            contactsList.add(5, person)
+            // notify recycler-view of data-change
+            contactsAdapter.notifyDataSetChanged()
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 }
