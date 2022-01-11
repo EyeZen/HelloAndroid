@@ -11,7 +11,7 @@ private const val TAG = "ContactsAdapter"
 class ContactsAdapter(val context: Context, val contacts: List<Person>) : RecyclerView.Adapter<ContactsAdapter.ViewHolder>() {
     // Create a new view - EXPENSIVE, called everytime a new list-item is created
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        Log.i(TAG, "onCreateViewHolder")
+//        Log.i(TAG, "onCreateViewHolder")
         // layout inflator converts xml-layouts to views
         // R = 'res' folder
         val view = LayoutInflater.from(context).inflate(R.layout.item_person, parent, false)
@@ -19,7 +19,7 @@ class ContactsAdapter(val context: Context, val contacts: List<Person>) : Recycl
     }
     // Bind the data at the position into the ViewHolder, everytime new data needs to be bound to the ViewHolder(item)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        Log.i(TAG, "onBindViewHolder: $position")
+//        Log.i(TAG, "onBindViewHolder: $position")
         val contact = contacts[position]
         holder.bind(contact)
     }

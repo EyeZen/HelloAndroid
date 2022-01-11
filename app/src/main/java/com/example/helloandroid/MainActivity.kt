@@ -22,8 +22,8 @@ class MainActivity : AppCompatActivity() {
         private const val REQUEST_CODE = 89
     }
     // declaring local, assignable variables
-    lateinit var contactsList: MutableList<Person>
-    lateinit var contactsAdapter: ContactsAdapter
+    private lateinit var contactsList: MutableList<Person>
+    private lateinit var contactsAdapter: ContactsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +42,33 @@ class MainActivity : AppCompatActivity() {
 
         // 6. Bind the adapter to the data source to populate the Recycler View
         rvContacts.layoutManager = LinearLayoutManager(this)
+
+        Log.i(TAG, "On Create")
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.i(TAG, "On Start")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.i(TAG, "On Resume")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.i(TAG, "On Pause")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.i(TAG, "On Stop")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.i(TAG, "On Destroy")
     }
 
     private fun createContacts(): MutableList<Person> {
@@ -58,13 +85,13 @@ class MainActivity : AppCompatActivity() {
     }
     // Menu Item Selected
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        Log.i(TAG, "onOptionsItemSelected")
+//        Log.i(TAG, "onOptionsItemSelected")
         if(item.itemId == R.id.mi_add) {
             val intent = Intent(this, AddContactActivity::class.java)
 //            startActivity(intent)     // For one way communication
             startActivityForResult(intent, REQUEST_CODE) // Deprecated
 //            registerForActivityResult(...)s
-            Log.i(TAG, "created activity inside onOptionsItemSelected")
+//            Log.i(TAG, "created activity inside onOptionsItemSelected")
             return true
         }
         return super.onOptionsItemSelected(item)
@@ -76,7 +103,7 @@ class MainActivity : AppCompatActivity() {
             // we got data back successfully from the AddContactActivity
             val person = data?.getSerializableExtra(KEY_PERSON) as Person
             contactsList.add(5, person)
-            // notify recycler-view of data-change
+            // notify recycler-view of data-change, should use specific events instead
             contactsAdapter.notifyDataSetChanged()
         }
         super.onActivityResult(requestCode, resultCode, data)
