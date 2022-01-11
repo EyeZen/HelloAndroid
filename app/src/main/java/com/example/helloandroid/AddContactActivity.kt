@@ -21,6 +21,7 @@ class AddContactActivity : AppCompatActivity() {
             Log.i(TAG, "Person name: $personName, age: $personAge")
             // Add this user to the list and display it in the main screen4
             val person = Person(personName, personAge)
+            // New Intent to return data
             val result = Intent()
             result.putExtra("person", person)
             setResult(Activity.RESULT_OK, result)

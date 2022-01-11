@@ -16,11 +16,12 @@ data class Person(val name: String, val age: Int) : Serializable
 const val KEY_PERSON = "person"
 
 class MainActivity : AppCompatActivity() {
+    // static members
     companion object {
         private const val TAG = "MainActivity"
         private const val REQUEST_CODE = 89
     }
-
+    // declaring local, assignable variables
     lateinit var contactsList: MutableList<Person>
     lateinit var contactsAdapter: ContactsAdapter
 
@@ -34,11 +35,10 @@ class MainActivity : AppCompatActivity() {
         // 2. Define a model class to use as the data source
         contactsList = createContacts()
         // 3. Add a RecyclerView to your activity to display the items
+        // 4. Create a custom row layout XML file to visualize the single item
+        // 5. Create a RecyclerView.Adapter and ViewHolder to render the item
         contactsAdapter = ContactsAdapter(this, contactsList)
         rvContacts.adapter = contactsAdapter
-        // 4. Create a custom row layout XML file to visualize the single item
-
-        // 5. Create a RecyclerView.Adapter and ViewHolder to render the item
 
         // 6. Bind the adapter to the data source to populate the Recycler View
         rvContacts.layoutManager = LinearLayoutManager(this)
@@ -51,25 +51,26 @@ class MainActivity : AppCompatActivity() {
         }
         return contacts
     }
-
+    // Menu Created
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
-
+    // Menu Item Selected
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         Log.i(TAG, "onOptionsItemSelected")
         if(item.itemId == R.id.mi_add) {
             val intent = Intent(this, AddContactActivity::class.java)
-//            startActivity(intent)
-            startActivityForResult(intent, REQUEST_CODE)
-//            registerForActivityResult(...)
+//            startActivity(intent)     // For one way communication
+            startActivityForResult(intent, REQUEST_CODE) // Deprecated
+//            registerForActivityResult(...)s
             Log.i(TAG, "created activity inside onOptionsItemSelected")
             return true
         }
         return super.onOptionsItemSelected(item)
     }
 
+    // called when result received from child activity, Deprecated
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if(requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             // we got data back successfully from the AddContactActivity

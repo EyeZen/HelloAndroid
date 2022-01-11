@@ -2,7 +2,9 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/mi_add"
-        android:icon="@drawable/plus"
-        android:title="plus" />
+    android:id="@+id/mi_add"
+    android:icon="@drawable/plus"
+        app:showAsAction="always"
+    android:title="plus" />
+
 </menu>
