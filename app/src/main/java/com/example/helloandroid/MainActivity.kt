@@ -1,14 +1,23 @@
 package com.example.helloandroid
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.loopj.android.http.AsyncHttpClient
+import com.loopj.android.http.JsonHttpResponseHandler
+import cz.msebera.android.httpclient.Header
 import kotlinx.android.synthetic.main.activity_main.*
+import org.json.JSONArray
 import java.io.Serializable
 
 data class Person(val name: String, val age: Int) : Serializable
@@ -20,6 +29,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "MainActivity"
         private const val REQUEST_CODE = 89
+        private const val REQUEST_READ_CONTACTS = 99
     }
     // declaring local, assignable variables
     private lateinit var contactsList: MutableList<Person>
@@ -43,7 +53,63 @@ class MainActivity : AppCompatActivity() {
         // 6. Bind the adapter to the data source to populate the Recycler View
         rvContacts.layoutManager = LinearLayoutManager(this)
 
+        // Runtime Permission Request
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED)
+        { // Permission Not Granted
+//            // Not the first time, show explanation
+            if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CONTACTS))
+            {
+                // Show additional explanation to the user "asynchronously"
+                Toast.makeText(this, "Give me the damn permission!", Toast.LENGTH_LONG)
+            } else {
+                // First Time, No explanation needed
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_CONTACTS), REQUEST_READ_CONTACTS)
+                // Handle the result in onRequestPermissionsResult
+
+            }
+        }
+
+        // Networking: AsyncHttpClient
+        val client = AsyncHttpClient()
+        client.get("https://api.covidtracking.com/v1/us/current.json", object: JsonHttpResponseHandler(){
+            override fun onSuccess(
+                statusCode: Int,
+                headers: Array<out Header>?,
+                response: JSONArray?
+            ) {
+                Log.i(TAG, "On Success")
+
+                if (response != null) {
+                    val jsonResponse = response.getJSONObject(0)
+                    val positive = jsonResponse.get("positive")
+                    val negative = jsonResponse.get("negative")
+                    val msg = "Covid Cases: +$positive -$negative"
+                    Log.i(TAG, msg)
+                    Toast.makeText(this@MainActivity, msg, Toast.LENGTH_LONG)
+                }
+                super.onSuccess(statusCode, headers, response)
+            }
+
+            override fun onFailure(
+                statusCode: Int,
+                headers: Array<out Header>?,
+                responseString: String?,
+                throwable: Throwable?
+            ) {
+                Log.e(TAG, "On Failure $throwable")
+                super.onFailure(statusCode, headers, responseString, throwable)
+            }
+        })
+
         Log.i(TAG, "On Create")
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     override fun onStart() {
